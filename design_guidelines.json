@@ -1,0 +1,176 @@
+{
+  "identity": {
+    "name": "FOX Locações",
+    "archetype": "Swiss & High-Contrast (Industrial Variant)",
+    "emotional_tone": "Reliable, Efficient, Structured, Industrial",
+    "visual_mood": "Clean, Data-Dense, Professional, Engineering-Grade"
+  },
+  "typography": {
+    "headings": {
+      "family": "Chivo, sans-serif",
+      "weights": ["700", "900"],
+      "usage": "Page titles, Card headers, KPI values",
+      "letter_spacing": "tracking-tight"
+    },
+    "body": {
+      "family": "Inter, sans-serif",
+      "weights": ["400", "500"],
+      "usage": "General text, form labels, table content",
+      "letter_spacing": "tracking-normal"
+    },
+    "mono": {
+      "family": "JetBrains Mono, monospace",
+      "weights": ["400"],
+      "usage": "IDs, Order Numbers, Financial Data, Status Codes",
+      "letter_spacing": "tracking-wide"
+    }
+  },
+  "colors": {
+    "primary": {
+      "name": "Fox Navy",
+      "hex": "#0F172A",
+      "tailwind": "bg-slate-900",
+      "usage": "Sidebar, Primary Buttons, Headings"
+    },
+    "secondary": {
+      "name": "Structural Gray",
+      "hex": "#64748B",
+      "tailwind": "bg-slate-500",
+      "usage": "Secondary text, Borders, Inactive icons"
+    },
+    "accent": {
+      "name": "Safety Orange",
+      "hex": "#F97316",
+      "tailwind": "bg-orange-500",
+      "usage": "Call to Actions (CTAs), Alerts, 'Active' status highlights"
+    },
+    "background": {
+      "name": "Industrial White",
+      "hex": "#F8FAFC",
+      "tailwind": "bg-slate-50",
+      "usage": "App background"
+    },
+    "surface": {
+      "name": "Pure White",
+      "hex": "#FFFFFF",
+      "tailwind": "bg-white",
+      "usage": "Cards, Tables, Modals"
+    },
+    "status": {
+      "success": "#10B981",
+      "warning": "#F59E0B",
+      "error": "#EF4444",
+      "info": "#3B82F6"
+    }
+  },
+  "layout": {
+    "structure": "Sidebar Navigation (Fixed Left) + Top Bar (Global Actions) + Main Content Area",
+    "grid_system": "The 'Control Room' Grid",
+    "spacing": "Generous internal padding (p-6, p-8) but tight component grouping (gap-4)",
+    "container": "max-w-[1600px] mx-auto for large screens",
+    "z_index": {
+      "modal": 50,
+      "dropdown": 40,
+      "sticky_header": 30,
+      "sidebar": 20
+    }
+  },
+  "components": {
+    "cards": {
+      "style": "Sharp or Minimal Radius (rounded-sm)",
+      "border": "1px solid #E2E8F0 (slate-200)",
+      "shadow": "shadow-sm",
+      "hover": "hover:shadow-md transition-shadow duration-200"
+    },
+    "buttons": {
+      "primary": "bg-slate-900 text-white hover:bg-slate-800 rounded-sm font-medium px-6 py-2",
+      "secondary": "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-sm font-medium px-6 py-2",
+      "accent": "bg-orange-500 text-white hover:bg-orange-600 rounded-sm font-bold px-6 py-2 shadow-orange-200"
+    },
+    "inputs": {
+      "style": "bg-white border-slate-200 focus:ring-2 focus:ring-slate-900 focus:border-transparent rounded-sm h-10"
+    },
+    "tables": {
+      "style": "Dense, Zebra-striping optional (even:bg-slate-50), Sticky Header",
+      "header": "text-xs font-bold text-slate-500 uppercase tracking-wider bg-slate-50 h-10",
+      "row": "border-b border-slate-100 hover:bg-slate-50 transition-colors h-12"
+    },
+    "badges": {
+      "style": "rounded-full px-2.5 py-0.5 text-xs font-medium",
+      "variants": {
+        "active": "bg-emerald-100 text-emerald-800",
+        "pending": "bg-amber-100 text-amber-800",
+        "late": "bg-red-100 text-red-800",
+        "neutral": "bg-slate-100 text-slate-800"
+      }
+    }
+  },
+  "visual_enhancers": {
+    "textures": "Subtle 'Blueprint Grid' pattern on the main dashboard background (opacity 0.03)",
+    "icons": "Lucide React (Stroke width 1.5px for elegance, 2px for active states)",
+    "motion": "Micro-interactions only. Button press scale (0.98). Table row hover fade. Slide-in for side panels."
+  },
+  "image_urls": {
+    "login_background": {
+      "url": "https://images.unsplash.com/photo-1757771440568-9613fc76b122",
+      "description": "Construction cranes and industrial site, sets the tone for the industry.",
+      "usage": "Full screen background for Login page with dark overlay"
+    },
+    "dumpster_inventory": {
+      "url": "https://images.unsplash.com/photo-1662826479300-6cc4ced8a1cc",
+      "description": "Colorful industrial waste containers",
+      "usage": "Empty state for Dumpster Management or Hero image for inventory section"
+    },
+    "logistics_truck": {
+      "url": "https://images.unsplash.com/photo-1760662052295-f84068499a03",
+      "description": "White delivery truck",
+      "usage": "Visual for 'Orders' or 'Logistics' section"
+    }
+  },
+  "pages_structure": {
+    "dashboard": {
+      "layout": "Bento Grid (Control Room Mode)",
+      "widgets": [
+        "KPI Summary (Total Active, Revenue, Late Orders)",
+        "Map View (Dumpster Locations)",
+        "Recent Orders Table",
+        "Financial Quick View (Cash Flow)"
+      ]
+    },
+    "dumpster_management": {
+      "layout": "Data Table with Filters + Status Kanban Board",
+      "features": ["Add New", "Edit Status", "QR Code View"]
+    },
+    "orders": {
+      "layout": "Split View (List on Left, Details on Right)",
+      "features": ["Create Order (Wizard)", "Timeline View", "Invoice Generation"]
+    },
+    "finance": {
+      "layout": "Tabbed Interface (Cash Flow | AP | AR)",
+      "features": ["Transaction List", "Summary Charts", "Export"]
+    }
+  },
+  "instructions_to_main_agent": [
+    "Use 'Chivo' for all headings. Import it from Google Fonts.",
+    "Use 'JetBrains Mono' for any ID, Price, or Date to ensure tabular alignment.",
+    "Implement the Sidebar as a fixed element on the left (w-64).",
+    "Use Shadcn UI components but override the 'rounded-md' to 'rounded-sm' to match the industrial aesthetic.",
+    "Ensure high contrast for all text. No gray-on-gray text.",
+    "For the Dashboard, use a 'Bento Grid' layout where the Map takes prominence.",
+    "Use the 'Safety Orange' accent color sparingly - only for primary actions or critical alerts.",
+    "Create a 'Blueprint' pattern background for the app wrapper using CSS radial-gradient dots."
+  ],
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy",
+    "Use glass-morphism effects with backdrop filters (12-24px blur) for sticky headers/overlays.",
+    "You MUST NOT apply universal transition. Eg: transition: all. This results in breaking transforms.",
+    "You MUST NOT center align the app container. This disrupts the human natural reading flow of text",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style",
+    "NEVER: use AI assistant Emoji characters like 🤖🧠 etc for icons.",
+    "Every interaction needs micro-animations - hover states, transitions.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "All interactive and key informational elements MUST include a data-testid attribute."
+  ]
+}
