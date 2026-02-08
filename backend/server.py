@@ -194,7 +194,8 @@ class OrderCreate(BaseModel):
     client_id: str
     dumpster_id: str
     order_type: OrderType
-    delivery_address: str
+    delivery_address: str  # Texto livre (fallback)
+    delivery_address_id: Optional[str] = None  # ID do endereço do cliente
     rental_value: float
     payment_method: PaymentMethod
     scheduled_date: datetime
