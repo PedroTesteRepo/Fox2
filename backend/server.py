@@ -84,8 +84,8 @@ class Token(BaseModel):
 class ClientCreate(BaseModel):
     name: str
     email: Optional[EmailStr] = None
-    phone: str
-    address: str
+    phone: str  # Mantido para compatibilidade, mas deprecated
+    address: str  # Mantido para compatibilidade, mas deprecated
     document: str
     document_type: Literal["cpf", "cnpj"]
 
@@ -94,11 +94,83 @@ class Client(BaseModel):
     id: str
     name: str
     email: Optional[EmailStr] = None
-    phone: str
-    address: str
+    phone: str  # Deprecated - usar client_phones
+    address: str  # Deprecated - usar client_addresses
     document: str
     document_type: Literal["cpf", "cnpj"]
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+# New models for multiple phones and addresses
+class ClientPhoneCreate(BaseModel):
+    phone: str
+    phone_type: str = "Celular"
+    is_primary: bool = False
+
+class ClientPhone(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    client_id: str
+    phone: str
+    phone_type: str
+    is_primary: bool
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ClientAddressCreate(BaseModel):
+    address_type: str = "Residencial"
+    cep: str
+    street: str
+    number: str
+    complement: Optional[str] = None
+    neighborhood: str
+    city: str
+    state: str
+    is_primary: bool = False
+
+class ClientAddress(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    client_id: str
+    address_type: str
+    cep: str
+    street: str
+    number: str
+    complement: Optional[str] = None
+    neighborhood: str
+    city: str
+    state: str
+    is_primary: bool
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ClientWithDetails(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    name: str
+    email: Optional[EmailStr] = None
+    document: str
+    document_type: Literal["cpf", "cnpj"]
+    created_at: datetime
+    phones: List[ClientPhone] = []
+    addresses: List[ClientAddress] = []
+
+class ViaCEPResponse(BaseModel):
+    cep: str
+    logradouro: str
+    complemento: str
+    bairro: str
+    localidade: str
+    uf: str
+    erro: Optional[bool] = None
+
+class ClientFinancialSummary(BaseModel):
+    client: Client
+    total_orders: int
+    pending_orders: int
+    completed_orders: int
+    total_receivable: float
+    total_received: float
+    pending_amount: float
+    orders: List[Order]
+    accounts_receivable: List[AccountsReceivable]
 
 class DumpsterCreate(BaseModel):
     identifier: str
