@@ -167,7 +167,7 @@ class FOXAPITester:
         # Restaura o token
         self.set_auth_token(old_token)
         
-        if not result["success"] and result["status_code"] == 401:
+        if not result["success"] and result.get("status_code") == 401:
             self.log("✅ Rota protegida funciona corretamente (401 sem auth)")
             return True
         else:
