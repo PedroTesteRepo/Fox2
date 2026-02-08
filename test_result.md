@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Migração completa do backend de MongoDB para MySQL/MariaDB mantendo todas as funcionalidades existentes"
+user_problem_statement: "Garantir que esteja tudo funcionando, e nas caçambas, mostrar todas as caçambas cadastradas com uma caçamba visual na tela, dentro dessa caçamba estará a cor (vermelho se estiver em manutenção, Amarelo se estiver em uso, ou verde se estiver disponivel). Ao fazer um pedido com essa caçamba, ele ja coloca ela automaticamente em uso. E criar uma tela para manutenção de caçambas, onde vamos colocar o motivo, fornecedor, data início/fim, custo, etc."
 
 backend:
   - task: "Autenticação - Registro e Login"
@@ -141,7 +141,7 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
@@ -149,6 +149,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ Testes completos realizados. Todas as operações CRUD funcionando corretamente. Criação, listagem, busca específica, atualização e exclusão de caçambas testados com sucesso. PATCH status funciona corretamente com parâmetros query."
+      - working: "NA"
+        agent: "main"
+        comment: "Atualizado frontend para exibir caçamba visual com cores (verde=disponível, amarelo=em uso, vermelho=manutenção). Precisa reteste no frontend."
 
   - task: "CRUD Pedidos"
     implemented: true
@@ -209,6 +212,43 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ Testes realizados com sucesso. Dashboard retorna todas as estatísticas esperadas: total_dumpsters, available_dumpsters, rented_dumpsters, active_orders, pending_orders, total_revenue_month, total_receivable, total_payable, cash_balance. Cálculos funcionando corretamente."
+
+  - task: "Sistema de Manutenção de Caçambas"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implementado sistema completo de manutenção: tabela dumpster_maintenance criada, models MaintenanceCreate/MaintenanceUpdate/Maintenance. Rotas: POST /api/dumpsters/{id}/maintenance (criar), GET /api/maintenance (listar todas), GET /api/dumpsters/{id}/maintenance (histórico), GET /api/maintenance/{id} (detalhes), PUT /api/maintenance/{id} (atualizar), PATCH /api/maintenance/{id}/complete (concluir), DELETE /api/maintenance/{id} (excluir). Ao criar manutenção, caçamba vai para status 'maintenance'. Ao concluir, retorna para 'available'. Campos opcionais: motivo, fornecedor, datas, custos, notas."
+
+frontend:
+  - task: "Visualização de Caçambas com Cores"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Dumpsters.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implementado componente DumpsterIcon que desenha uma caçamba em SVG. A cor muda conforme status: verde (#10b981) = disponível, amarelo (#f59e0b) = em uso/rented, vermelho (#ef4444) = manutenção, azul (#3b82f6) = em trânsito. Layout dos cards reorganizado para destacar a caçamba visual no topo. Label 'Alugada' mudada para 'Em Uso'."
+
+  - task: "Página de Manutenções"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Maintenance.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Criada nova página /maintenance com menu no Sidebar. Interface completa para gerenciar manutenções: formulário com campos motivo, fornecedor, datas (início/fim), custo estimado, notas (todos opcionais exceto caçamba). Lista todas manutenções com cards informativos mostrando status (em andamento/concluída/cancelada), datas, custos. Botão 'Concluir' para finalizar manutenção e retornar caçamba ao status disponível. CRUD completo: criar, editar (somente em andamento), excluir. Histórico completo de manutenções por caçamba."
 
 metadata:
   created_by: "main_agent"
