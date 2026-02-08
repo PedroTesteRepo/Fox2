@@ -137,15 +137,18 @@ backend:
 
   - task: "CRUD Caçambas"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implementado com MySQL - rotas /api/dumpsters (POST, GET, PUT, DELETE, PATCH status)"
+      - working: true
+        agent: "testing"
+        comment: "✅ Testes completos realizados. Todas as operações CRUD funcionando corretamente. Criação, listagem, busca específica, atualização e exclusão de caçambas testados com sucesso. PATCH status funciona corretamente com parâmetros query."
 
   - task: "CRUD Pedidos"
     implemented: true
