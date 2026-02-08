@@ -278,6 +278,47 @@ class DashboardStats(BaseModel):
     total_payable: float
     cash_balance: float
 
+class MaintenanceStatus(str, Enum):
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+
+class MaintenanceCreate(BaseModel):
+    reason: Optional[str] = None
+    supplier: Optional[str] = None
+    start_date: datetime
+    expected_end_date: Optional[datetime] = None
+    estimated_cost: Optional[float] = None
+    notes: Optional[str] = None
+
+class MaintenanceUpdate(BaseModel):
+    reason: Optional[str] = None
+    supplier: Optional[str] = None
+    start_date: Optional[datetime] = None
+    expected_end_date: Optional[datetime] = None
+    actual_end_date: Optional[datetime] = None
+    estimated_cost: Optional[float] = None
+    actual_cost: Optional[float] = None
+    notes: Optional[str] = None
+    status: Optional[MaintenanceStatus] = None
+
+class Maintenance(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    dumpster_id: str
+    dumpster_identifier: Optional[str] = None
+    reason: Optional[str] = None
+    supplier: Optional[str] = None
+    start_date: datetime
+    expected_end_date: Optional[datetime] = None
+    actual_end_date: Optional[datetime] = None
+    estimated_cost: Optional[float] = None
+    actual_cost: Optional[float] = None
+    notes: Optional[str] = None
+    status: MaintenanceStatus = MaintenanceStatus.IN_PROGRESS
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 # Database connection
 async def get_db():
     global db_pool
