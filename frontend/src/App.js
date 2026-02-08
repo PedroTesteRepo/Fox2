@@ -8,6 +8,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Clients } from './pages/Clients';
 import { Dumpsters } from './pages/Dumpsters';
 import { Orders } from './pages/Orders';
+import { Maintenance } from './pages/Maintenance';
 import { Cash } from './pages/Cash';
 import { AccountsReceivable } from './pages/AccountsReceivable';
 import { AccountsPayable } from './pages/AccountsPayable';
