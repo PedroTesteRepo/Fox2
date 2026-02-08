@@ -196,7 +196,7 @@ export const Orders = () => {
                     <Label htmlFor="client_id" data-testid="client-label">Cliente</Label>
                     <Select
                       value={formData.client_id}
-                      onValueChange={(value) => setFormData({ ...formData, client_id: value })}
+                      onValueChange={handleClientChange}
                       required
                     >
                       <SelectTrigger className="rounded-sm" data-testid="client-select">
