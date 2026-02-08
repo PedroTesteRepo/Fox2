@@ -246,6 +246,17 @@ class AccountsReceivable(BaseModel):
     notes: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+class ClientFinancialSummary(BaseModel):
+    client: Client
+    total_orders: int
+    pending_orders: int
+    completed_orders: int
+    total_receivable: float
+    total_received: float
+    pending_amount: float
+    orders: List[Order]
+    accounts_receivable: List[AccountsReceivable]
+
 class Transaction(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str
