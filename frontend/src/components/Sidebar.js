@@ -27,6 +27,7 @@ export const Sidebar = () => {
     { path: '/clients', icon: Users, label: 'Clientes' },
     { path: '/dumpsters', icon: Container, label: 'Caçambas' },
     { path: '/orders', icon: FileText, label: 'Pedidos' },
+    { path: '/maintenance', icon: Wrench, label: 'Manutenções' },
     { path: '/finance/cash', icon: Wallet, label: 'Caixa' },
     { path: '/finance/receivable', icon: TrendingUp, label: 'Contas a Receber' },
     { path: '/finance/payable', icon: TrendingDown, label: 'Contas a Pagar' },
