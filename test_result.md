@@ -197,15 +197,18 @@ backend:
 
   - task: "Dashboard Stats"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implementado com MySQL - rota /api/dashboard/stats"
+      - working: true
+        agent: "testing"
+        comment: "✅ Testes realizados com sucesso. Dashboard retorna todas as estatísticas esperadas: total_dumpsters, available_dumpsters, rented_dumpsters, active_orders, pending_orders, total_revenue_month, total_receivable, total_payable, cash_balance. Cálculos funcionando corretamente."
 
 metadata:
   created_by: "main_agent"
