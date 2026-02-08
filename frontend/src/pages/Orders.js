@@ -52,6 +52,36 @@ export const Orders = () => {
     }
   };
 
+  const loadClientAddresses = async (clientId) => {
+    if (!clientId) {
+      setClientAddresses([]);
+      return;
+    }
+    try {
+      const response = await axios.get(`${API}/clients/${clientId}/addresses`);
+      setClientAddresses(response.data);
+    } catch (error) {
+      console.error('Error loading addresses:', error);
+      setClientAddresses([]);
+    }
+  };
+
+  const handleClientChange = (clientId) => {
+    setFormData({ ...formData, client_id: clientId, delivery_address_id: '', delivery_address: '' });
+    loadClientAddresses(clientId);
+  };
+
+  const handleAddressSelect = (addressId) => {
+    setFormData({ ...formData, delivery_address_id: addressId });
+    
+    // Find and display the selected address
+    const address = clientAddresses.find(a => a.id === addressId);
+    if (address) {
+      const fullAddress = `${address.street}, ${address.number}${address.complement ? ' - ' + address.complement : ''} - ${address.neighborhood}, ${address.city}/${address.state} - CEP: ${address.cep}`;
+      setFormData(prev => ({ ...prev, delivery_address: fullAddress, delivery_address_id: addressId }));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
