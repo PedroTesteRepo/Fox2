@@ -253,20 +253,16 @@ frontend:
 metadata:
   created_by: "main_agent"
   version: "1.0"
-  test_sequence: 1
+  test_sequence: 2
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Autenticação - Registro e Login"
-    - "CRUD Clientes"
-    - "CRUD Caçambas"
-    - "CRUD Pedidos"
-    - "Contas a Pagar"
-    - "Contas a Receber"
-    - "Dashboard Stats"
+    - "Sistema de Manutenção de Caçambas"
+    - "Visualização de Caçambas com Cores"
+    - "Página de Manutenções"
   stuck_tasks: []
-  test_all: true
+  test_all: false
   test_priority: "high_first"
 
 agent_communication:
@@ -274,3 +270,5 @@ agent_communication:
     message: "Backend completamente migrado de MongoDB para MySQL/MariaDB. Todas as rotas foram reimplementadas usando aiomysql. Banco de dados fox_db criado com todas as tabelas necessárias. Backend está rodando na porta 8001. Pronto para testes."
   - agent: "testing"
     message: "✅ Testes completos realizados em todas as rotas do backend FOX. 7/8 módulos funcionando perfeitamente. Sistema migrado com sucesso de MongoDB para MySQL/MariaDB. Autenticação JWT, CRUD completo de clientes/caçambas/pedidos, módulo financeiro e dashboard - todos funcionais. Apenas pequeno ajuste menor no teste de proteção de rotas (retorna 403 em vez de 401, ambos válidos). Sistema pronto para produção."
+  - agent: "main"
+    message: "✅ NOVAS FEATURES IMPLEMENTADAS: 1) Sistema completo de manutenção de caçambas no backend com tabela dedicada e 7 rotas API. 2) Frontend atualizado: página Caçambas agora mostra caçamba visual em SVG com cores dinâmicas (verde/amarelo/vermelho/azul). 3) Nova página 'Manutenções' no menu com CRUD completo, formulário com campos opcionais, botão concluir, histórico. MariaDB instalado e configurado. Backend e frontend compilando com sucesso. Pronto para testes das novas funcionalidades."
