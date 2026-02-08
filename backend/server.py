@@ -1111,6 +1111,38 @@ async def get_client_orders(client_id: str, current_user: User = Depends(get_cur
             orders = await cursor.fetchall()
             return [Order(**o) for o in orders]
 
+# Setup migration endpoint (for creating maintenance table)
+@api_router.post("/setup/maintenance-table")
+async def setup_maintenance_table():
+    pool = await get_db()
+    async with pool.acquire() as conn:
+        async with conn.cursor() as cursor:
+            try:
+                await cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS dumpster_maintenance (
+                        id VARCHAR(36) PRIMARY KEY,
+                        dumpster_id VARCHAR(36) NOT NULL,
+                        reason TEXT,
+                        supplier VARCHAR(255),
+                        start_date DATETIME NOT NULL,
+                        expected_end_date DATETIME,
+                        actual_end_date DATETIME,
+                        estimated_cost DECIMAL(10, 2),
+                        actual_cost DECIMAL(10, 2),
+                        notes TEXT,
+                        status ENUM('in_progress', 'completed', 'cancelled') NOT NULL DEFAULT 'in_progress',
+                        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                        INDEX idx_dumpster_id (dumpster_id),
+                        INDEX idx_status (status),
+                        INDEX idx_start_date (start_date),
+                        FOREIGN KEY (dumpster_id) REFERENCES dumpsters(id) ON DELETE CASCADE
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+                """)
+                return {"message": "Maintenance table created successfully"}
+            except Exception as e:
+                return {"message": f"Table might already exist or error: {str(e)}"}
+
 # Maintenance routes
 @api_router.post("/dumpsters/{dumpster_id}/maintenance", response_model=Maintenance)
 async def create_maintenance(dumpster_id: str, maintenance: MaintenanceCreate, current_user: User = Depends(get_current_user)):
