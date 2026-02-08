@@ -284,22 +284,22 @@ export const Dumpsters = () => {
                   data-testid={`dumpster-card-${dumpster.id}`}
                 >
                   <div className="p-6">
+                    {/* Caçamba Visual */}
+                    <div className="flex justify-center mb-4">
+                      <DumpsterIcon status={dumpster.status} size={100} />
+                    </div>
+
                     <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-slate-100 rounded-sm">
-                          <Container className="w-6 h-6 text-slate-700" />
-                        </div>
-                        <div>
-                          <h3 className="font-heading font-bold text-lg text-slate-900" data-testid={`dumpster-identifier-${dumpster.id}`}>
-                            {dumpster.identifier}
-                          </h3>
-                          <span 
-                            className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-medium mt-1 ${getStatusBadgeClass(dumpster.status)}`}
-                            data-testid={`dumpster-status-${dumpster.id}`}
-                          >
-                            {getStatusLabel(dumpster.status)}
-                          </span>
-                        </div>
+                      <div className="flex-1 text-center">
+                        <h3 className="font-heading font-bold text-xl text-slate-900 mb-2" data-testid={`dumpster-identifier-${dumpster.id}`}>
+                          {dumpster.identifier}
+                        </h3>
+                        <span 
+                          className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusBadgeClass(dumpster.status)}`}
+                          data-testid={`dumpster-status-${dumpster.id}`}
+                        >
+                          {getStatusLabel(dumpster.status)}
+                        </span>
                       </div>
                     </div>
 
@@ -334,7 +334,7 @@ export const Dumpsters = () => {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="available">Disponível</SelectItem>
-                          <SelectItem value="rented">Alugada</SelectItem>
+                          <SelectItem value="rented">Em Uso</SelectItem>
                           <SelectItem value="maintenance">Manutenção</SelectItem>
                           <SelectItem value="in_transit">Em Trânsito</SelectItem>
                         </SelectContent>
