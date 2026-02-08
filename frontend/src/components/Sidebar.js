@@ -9,7 +9,8 @@ import {
   Wallet, 
   LogOut,
   TrendingUp,
-  TrendingDown
+  TrendingDown,
+  Wrench
 } from 'lucide-react';
 
 export const Sidebar = () => {
