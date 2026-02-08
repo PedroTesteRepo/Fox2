@@ -107,15 +107,18 @@ user_problem_statement: "Migração completa do backend de MongoDB para MySQL/Ma
 backend:
   - task: "Autenticação - Registro e Login"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implementado com MySQL - rotas /api/auth/register e /api/auth/login"
+      - working: true
+        agent: "testing"
+        comment: "✅ Testes realizados com sucesso. Registro e login funcionando corretamente com JWT. Rotas protegidas retornam 403/401 apropriadamente. Token gerado e validado corretamente."
 
   - task: "CRUD Clientes"
     implemented: true
