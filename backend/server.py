@@ -434,6 +434,248 @@ async def delete_client(client_id: str, current_user: User = Depends(get_current
                 raise HTTPException(status_code=404, detail="Client not found")
             return {"message": "Client deleted successfully"}
 
+# Client Phones routes
+@api_router.post("/clients/{client_id}/phones", response_model=ClientPhone)
+async def create_client_phone(client_id: str, phone_data: ClientPhoneCreate, current_user: User = Depends(get_current_user)):
+    pool = await get_db()
+    phone_id = str(uuid.uuid4())
+    async with pool.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            # Check if client exists
+            await cursor.execute("SELECT id FROM clients WHERE id = %s", (client_id,))
+            if not await cursor.fetchone():
+                raise HTTPException(status_code=404, detail="Client not found")
+            
+            # If is_primary is True, set all other phones to non-primary
+            if phone_data.is_primary:
+                await cursor.execute(
+                    "UPDATE client_phones SET is_primary = FALSE WHERE client_id = %s",
+                    (client_id,)
+                )
+            
+            await cursor.execute(
+                """INSERT INTO client_phones (id, client_id, phone, phone_type, is_primary, created_at)
+                   VALUES (%s, %s, %s, %s, %s, %s)""",
+                (phone_id, client_id, phone_data.phone, phone_data.phone_type, 
+                 phone_data.is_primary, datetime.now(timezone.utc))
+            )
+            
+            await cursor.execute("SELECT * FROM client_phones WHERE id = %s", (phone_id,))
+            result = await cursor.fetchone()
+            return ClientPhone(**result)
+
+@api_router.get("/clients/{client_id}/phones", response_model=List[ClientPhone])
+async def get_client_phones(client_id: str, current_user: User = Depends(get_current_user)):
+    pool = await get_db()
+    async with pool.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            await cursor.execute(
+                "SELECT * FROM client_phones WHERE client_id = %s ORDER BY is_primary DESC, created_at ASC",
+                (client_id,)
+            )
+            phones = await cursor.fetchall()
+            return [ClientPhone(**p) for p in phones]
+
+@api_router.put("/clients/{client_id}/phones/{phone_id}", response_model=ClientPhone)
+async def update_client_phone(client_id: str, phone_id: str, phone_data: ClientPhoneCreate, current_user: User = Depends(get_current_user)):
+    pool = await get_db()
+    async with pool.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            # If is_primary is True, set all other phones to non-primary
+            if phone_data.is_primary:
+                await cursor.execute(
+                    "UPDATE client_phones SET is_primary = FALSE WHERE client_id = %s AND id != %s",
+                    (client_id, phone_id)
+                )
+            
+            await cursor.execute(
+                """UPDATE client_phones SET phone = %s, phone_type = %s, is_primary = %s 
+                   WHERE id = %s AND client_id = %s""",
+                (phone_data.phone, phone_data.phone_type, phone_data.is_primary, phone_id, client_id)
+            )
+            if cursor.rowcount == 0:
+                raise HTTPException(status_code=404, detail="Phone not found")
+            
+            await cursor.execute("SELECT * FROM client_phones WHERE id = %s", (phone_id,))
+            result = await cursor.fetchone()
+            return ClientPhone(**result)
+
+@api_router.delete("/clients/{client_id}/phones/{phone_id}")
+async def delete_client_phone(client_id: str, phone_id: str, current_user: User = Depends(get_current_user)):
+    pool = await get_db()
+    async with pool.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            await cursor.execute(
+                "DELETE FROM client_phones WHERE id = %s AND client_id = %s",
+                (phone_id, client_id)
+            )
+            if cursor.rowcount == 0:
+                raise HTTPException(status_code=404, detail="Phone not found")
+            return {"message": "Phone deleted successfully"}
+
+# Client Addresses routes
+@api_router.post("/clients/{client_id}/addresses", response_model=ClientAddress)
+async def create_client_address(client_id: str, address_data: ClientAddressCreate, current_user: User = Depends(get_current_user)):
+    pool = await get_db()
+    address_id = str(uuid.uuid4())
+    async with pool.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            # Check if client exists
+            await cursor.execute("SELECT id FROM clients WHERE id = %s", (client_id,))
+            if not await cursor.fetchone():
+                raise HTTPException(status_code=404, detail="Client not found")
+            
+            # If is_primary is True, set all other addresses to non-primary
+            if address_data.is_primary:
+                await cursor.execute(
+                    "UPDATE client_addresses SET is_primary = FALSE WHERE client_id = %s",
+                    (client_id,)
+                )
+            
+            await cursor.execute(
+                """INSERT INTO client_addresses (id, client_id, address_type, cep, street, number, 
+                   complement, neighborhood, city, state, is_primary, created_at)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                (address_id, client_id, address_data.address_type, address_data.cep,
+                 address_data.street, address_data.number, address_data.complement,
+                 address_data.neighborhood, address_data.city, address_data.state,
+                 address_data.is_primary, datetime.now(timezone.utc))
+            )
+            
+            await cursor.execute("SELECT * FROM client_addresses WHERE id = %s", (address_id,))
+            result = await cursor.fetchone()
+            return ClientAddress(**result)
+
+@api_router.get("/clients/{client_id}/addresses", response_model=List[ClientAddress])
+async def get_client_addresses(client_id: str, current_user: User = Depends(get_current_user)):
+    pool = await get_db()
+    async with pool.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            await cursor.execute(
+                "SELECT * FROM client_addresses WHERE client_id = %s ORDER BY is_primary DESC, created_at ASC",
+                (client_id,)
+            )
+            addresses = await cursor.fetchall()
+            return [ClientAddress(**a) for a in addresses]
+
+@api_router.put("/clients/{client_id}/addresses/{address_id}", response_model=ClientAddress)
+async def update_client_address(client_id: str, address_id: str, address_data: ClientAddressCreate, current_user: User = Depends(get_current_user)):
+    pool = await get_db()
+    async with pool.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            # If is_primary is True, set all other addresses to non-primary
+            if address_data.is_primary:
+                await cursor.execute(
+                    "UPDATE client_addresses SET is_primary = FALSE WHERE client_id = %s AND id != %s",
+                    (client_id, address_id)
+                )
+            
+            await cursor.execute(
+                """UPDATE client_addresses SET address_type = %s, cep = %s, street = %s, 
+                   number = %s, complement = %s, neighborhood = %s, city = %s, state = %s, 
+                   is_primary = %s WHERE id = %s AND client_id = %s""",
+                (address_data.address_type, address_data.cep, address_data.street,
+                 address_data.number, address_data.complement, address_data.neighborhood,
+                 address_data.city, address_data.state, address_data.is_primary, 
+                 address_id, client_id)
+            )
+            if cursor.rowcount == 0:
+                raise HTTPException(status_code=404, detail="Address not found")
+            
+            await cursor.execute("SELECT * FROM client_addresses WHERE id = %s", (address_id,))
+            result = await cursor.fetchone()
+            return ClientAddress(**result)
+
+@api_router.delete("/clients/{client_id}/addresses/{address_id}")
+async def delete_client_address(client_id: str, address_id: str, current_user: User = Depends(get_current_user)):
+    pool = await get_db()
+    async with pool.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            await cursor.execute(
+                "DELETE FROM client_addresses WHERE id = %s AND client_id = %s",
+                (address_id, client_id)
+            )
+            if cursor.rowcount == 0:
+                raise HTTPException(status_code=404, detail="Address not found")
+            return {"message": "Address deleted successfully"}
+
+# CEP Lookup (ViaCEP integration)
+@api_router.get("/cep/{cep}")
+async def get_address_by_cep(cep: str, current_user: User = Depends(get_current_user)):
+    # Remove non-numeric characters
+    cep_clean = ''.join(filter(str.isdigit, cep))
+    
+    if len(cep_clean) != 8:
+        raise HTTPException(status_code=400, detail="CEP must have 8 digits")
+    
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"https://viacep.com.br/ws/{cep_clean}/json/")
+            response.raise_for_status()
+            data = response.json()
+            
+            if data.get("erro"):
+                raise HTTPException(status_code=404, detail="CEP not found")
+            
+            return {
+                "cep": data.get("cep", ""),
+                "street": data.get("logradouro", ""),
+                "complement": data.get("complemento", ""),
+                "neighborhood": data.get("bairro", ""),
+                "city": data.get("localidade", ""),
+                "state": data.get("uf", "")
+            }
+    except httpx.HTTPError:
+        raise HTTPException(status_code=503, detail="Error connecting to CEP service")
+
+# Client Financial Summary
+@api_router.get("/clients/{client_id}/financial-summary", response_model=ClientFinancialSummary)
+async def get_client_financial_summary(client_id: str, current_user: User = Depends(get_current_user)):
+    pool = await get_db()
+    async with pool.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            # Get client
+            await cursor.execute("SELECT * FROM clients WHERE id = %s", (client_id,))
+            client = await cursor.fetchone()
+            if not client:
+                raise HTTPException(status_code=404, detail="Client not found")
+            
+            # Get orders
+            await cursor.execute(
+                "SELECT * FROM orders WHERE client_id = %s ORDER BY created_at DESC",
+                (client_id,)
+            )
+            orders = await cursor.fetchall()
+            
+            # Get accounts receivable
+            await cursor.execute(
+                "SELECT * FROM accounts_receivable WHERE client_id = %s ORDER BY due_date ASC",
+                (client_id,)
+            )
+            accounts = await cursor.fetchall()
+            
+            # Calculate statistics
+            total_orders = len(orders)
+            pending_orders = len([o for o in orders if o["status"] == OrderStatus.PENDING or o["status"] == OrderStatus.IN_PROGRESS])
+            completed_orders = len([o for o in orders if o["status"] == OrderStatus.COMPLETED])
+            
+            total_receivable = sum(a["amount"] for a in accounts)
+            total_received = sum(a["amount"] for a in accounts if a["is_received"])
+            pending_amount = sum(a["amount"] for a in accounts if not a["is_received"])
+            
+            return ClientFinancialSummary(
+                client=Client(**client),
+                total_orders=total_orders,
+                pending_orders=pending_orders,
+                completed_orders=completed_orders,
+                total_receivable=total_receivable,
+                total_received=total_received,
+                pending_amount=pending_amount,
+                orders=[Order(**o) for o in orders],
+                accounts_receivable=[AccountsReceivable(**a) for a in accounts]
+            )
+
+
 # Dumpster routes
 @api_router.post("/dumpsters", response_model=Dumpster)
 async def create_dumpster(dumpster: DumpsterCreate, current_user: User = Depends(get_current_user)):
