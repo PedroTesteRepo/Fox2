@@ -785,22 +785,38 @@ async def create_order(order: OrderCreate, current_user: User = Depends(get_curr
             if dumpster["status"] != DumpsterStatus.AVAILABLE and order.order_type == OrderType.PLACEMENT:
                 raise HTTPException(status_code=400, detail="Dumpster not available")
             
+            # If delivery_address_id is provided, get the full address
+            delivery_address_text = order.delivery_address
+            if order.delivery_address_id:
+                await cursor.execute(
+                    "SELECT * FROM client_addresses WHERE id = %s AND client_id = %s",
+                    (order.delivery_address_id, order.client_id)
+                )
+                address = await cursor.fetchone()
+                if address:
+                    # Format full address
+                    delivery_address_text = f"{address['street']}, {address['number']}"
+                    if address['complement']:
+                        delivery_address_text += f" - {address['complement']}"
+                    delivery_address_text += f" - {address['neighborhood']}, {address['city']}/{address['state']} - CEP: {address['cep']}"
+            
             # Create order
             await cursor.execute(
                 """INSERT INTO orders (id, client_id, client_name, dumpster_id, dumpster_identifier,
-                   order_type, status, delivery_address, rental_value, payment_method, 
+                   order_type, status, delivery_address, delivery_address_id, rental_value, payment_method, 
                    scheduled_date, completed_date, notes, created_at)
-                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
                 (order_id, order.client_id, client["name"], order.dumpster_id, dumpster["identifier"],
-                 order.order_type, OrderStatus.PENDING, order.delivery_address, order.rental_value,
-                 order.payment_method, order.scheduled_date, None, order.notes, datetime.now(timezone.utc))
+                 order.order_type, OrderStatus.PENDING, delivery_address_text, order.delivery_address_id,
+                 order.rental_value, order.payment_method, order.scheduled_date, None, order.notes, 
+                 datetime.now(timezone.utc))
             )
             
             # Update dumpster status
             if order.order_type == OrderType.PLACEMENT:
                 await cursor.execute(
                     "UPDATE dumpsters SET status = %s, current_location = %s WHERE id = %s",
-                    (DumpsterStatus.RENTED, order.delivery_address, order.dumpster_id)
+                    (DumpsterStatus.RENTED, delivery_address_text, order.dumpster_id)
                 )
             
             # Create accounts receivable
