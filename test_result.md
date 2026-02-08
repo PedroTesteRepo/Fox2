@@ -182,15 +182,18 @@ backend:
 
   - task: "Contas a Receber"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implementado com MySQL - rotas /api/finance/accounts-receivable"
+      - working: true
+        agent: "testing"
+        comment: "✅ Testes realizados com sucesso. Contas a receber são criadas automaticamente ao criar pedidos. Listagem e marcação como recebido funcionando corretamente. Integração com pedidos validada."
 
   - task: "Dashboard Stats"
     implemented: true
