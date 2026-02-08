@@ -152,15 +152,18 @@ backend:
 
   - task: "CRUD Pedidos"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implementado com MySQL - rotas /api/orders (POST, GET, PUT, DELETE, PATCH status)"
+      - working: true
+        agent: "testing"
+        comment: "✅ Testes completos realizados. Todas as operações CRUD funcionando corretamente. Criação de pedidos altera status da caçamba para 'rented' como esperado. Histórico de pedidos por cliente funciona. Conta a receber é criada automaticamente no pedido."
 
   - task: "Contas a Pagar"
     implemented: true
