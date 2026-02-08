@@ -116,11 +116,13 @@ export const Orders = () => {
       dumpster_id: '',
       order_type: 'placement',
       delivery_address: '',
+      delivery_address_id: '',
       rental_value: '',
       payment_method: 'cash',
       scheduled_date: '',
       notes: ''
     });
+    setClientAddresses([]);
   };
 
   const getStatusBadgeClass = (status) => {
