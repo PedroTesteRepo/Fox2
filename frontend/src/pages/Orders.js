@@ -16,6 +16,7 @@ export const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [clients, setClients] = useState([]);
   const [dumpsters, setDumpsters] = useState([]);
+  const [clientAddresses, setClientAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -23,6 +24,7 @@ export const Orders = () => {
     dumpster_id: '',
     order_type: 'placement',
     delivery_address: '',
+    delivery_address_id: '',
     rental_value: '',
     payment_method: 'cash',
     scheduled_date: '',
