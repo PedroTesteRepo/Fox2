@@ -173,6 +173,17 @@ class ClientFinancialSummary(BaseModel):
     orders: List[Order]
     accounts_receivable: List[AccountsReceivable]
 
+class ClientFinancialSummary(BaseModel):
+    client: Client
+    total_orders: int
+    pending_orders: int
+    completed_orders: int
+    total_receivable: float
+    total_received: float
+    pending_amount: float
+    orders: List[Order]
+    accounts_receivable: List[AccountsReceivable]
+
 class DumpsterCreate(BaseModel):
     identifier: str
     size: str
