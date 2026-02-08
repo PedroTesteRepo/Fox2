@@ -1111,6 +1111,193 @@ async def get_client_orders(client_id: str, current_user: User = Depends(get_cur
             orders = await cursor.fetchall()
             return [Order(**o) for o in orders]
 
+# Maintenance routes
+@api_router.post("/dumpsters/{dumpster_id}/maintenance", response_model=Maintenance)
+async def create_maintenance(dumpster_id: str, maintenance: MaintenanceCreate, current_user: User = Depends(get_current_user)):
+    pool = await get_db()
+    maintenance_id = str(uuid.uuid4())
+    
+    async with pool.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            # Check if dumpster exists
+            await cursor.execute("SELECT * FROM dumpsters WHERE id = %s", (dumpster_id,))
+            dumpster = await cursor.fetchone()
+            if not dumpster:
+                raise HTTPException(status_code=404, detail="Dumpster not found")
+            
+            # Create maintenance record
+            await cursor.execute(
+                """INSERT INTO dumpster_maintenance (id, dumpster_id, reason, supplier, start_date,
+                   expected_end_date, estimated_cost, notes, status, created_at, updated_at)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                (maintenance_id, dumpster_id, maintenance.reason, maintenance.supplier, 
+                 maintenance.start_date, maintenance.expected_end_date, maintenance.estimated_cost,
+                 maintenance.notes, MaintenanceStatus.IN_PROGRESS, 
+                 datetime.now(timezone.utc), datetime.now(timezone.utc))
+            )
+            
+            # Update dumpster status to maintenance
+            await cursor.execute(
+                "UPDATE dumpsters SET status = %s WHERE id = %s",
+                (DumpsterStatus.MAINTENANCE, dumpster_id)
+            )
+            
+            await cursor.execute("SELECT * FROM dumpster_maintenance WHERE id = %s", (maintenance_id,))
+            result = await cursor.fetchone()
+            result['dumpster_identifier'] = dumpster['identifier']
+            return Maintenance(**result)
+
+@api_router.get("/maintenance", response_model=List[Maintenance])
+async def get_all_maintenance(current_user: User = Depends(get_current_user)):
+    pool = await get_db()
+    async with pool.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            await cursor.execute(
+                """SELECT m.*, d.identifier as dumpster_identifier 
+                   FROM dumpster_maintenance m
+                   JOIN dumpsters d ON m.dumpster_id = d.id
+                   ORDER BY m.created_at DESC"""
+            )
+            maintenances = await cursor.fetchall()
+            return [Maintenance(**m) for m in maintenances]
+
+@api_router.get("/dumpsters/{dumpster_id}/maintenance", response_model=List[Maintenance])
+async def get_dumpster_maintenance(dumpster_id: str, current_user: User = Depends(get_current_user)):
+    pool = await get_db()
+    async with pool.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            # Check if dumpster exists
+            await cursor.execute("SELECT identifier FROM dumpsters WHERE id = %s", (dumpster_id,))
+            dumpster = await cursor.fetchone()
+            if not dumpster:
+                raise HTTPException(status_code=404, detail="Dumpster not found")
+            
+            await cursor.execute(
+                "SELECT * FROM dumpster_maintenance WHERE dumpster_id = %s ORDER BY created_at DESC",
+                (dumpster_id,)
+            )
+            maintenances = await cursor.fetchall()
+            for m in maintenances:
+                m['dumpster_identifier'] = dumpster['identifier']
+            return [Maintenance(**m) for m in maintenances]
+
+@api_router.get("/maintenance/{maintenance_id}", response_model=Maintenance)
+async def get_maintenance(maintenance_id: str, current_user: User = Depends(get_current_user)):
+    pool = await get_db()
+    async with pool.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            await cursor.execute(
+                """SELECT m.*, d.identifier as dumpster_identifier 
+                   FROM dumpster_maintenance m
+                   JOIN dumpsters d ON m.dumpster_id = d.id
+                   WHERE m.id = %s""",
+                (maintenance_id,)
+            )
+            maintenance = await cursor.fetchone()
+            if not maintenance:
+                raise HTTPException(status_code=404, detail="Maintenance record not found")
+            return Maintenance(**maintenance)
+
+@api_router.put("/maintenance/{maintenance_id}", response_model=Maintenance)
+async def update_maintenance(maintenance_id: str, maintenance_data: MaintenanceUpdate, current_user: User = Depends(get_current_user)):
+    pool = await get_db()
+    async with pool.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            # Get existing maintenance
+            await cursor.execute("SELECT * FROM dumpster_maintenance WHERE id = %s", (maintenance_id,))
+            existing = await cursor.fetchone()
+            if not existing:
+                raise HTTPException(status_code=404, detail="Maintenance record not found")
+            
+            # Build update query dynamically
+            update_fields = []
+            update_values = []
+            
+            if maintenance_data.reason is not None:
+                update_fields.append("reason = %s")
+                update_values.append(maintenance_data.reason)
+            if maintenance_data.supplier is not None:
+                update_fields.append("supplier = %s")
+                update_values.append(maintenance_data.supplier)
+            if maintenance_data.start_date is not None:
+                update_fields.append("start_date = %s")
+                update_values.append(maintenance_data.start_date)
+            if maintenance_data.expected_end_date is not None:
+                update_fields.append("expected_end_date = %s")
+                update_values.append(maintenance_data.expected_end_date)
+            if maintenance_data.actual_end_date is not None:
+                update_fields.append("actual_end_date = %s")
+                update_values.append(maintenance_data.actual_end_date)
+            if maintenance_data.estimated_cost is not None:
+                update_fields.append("estimated_cost = %s")
+                update_values.append(maintenance_data.estimated_cost)
+            if maintenance_data.actual_cost is not None:
+                update_fields.append("actual_cost = %s")
+                update_values.append(maintenance_data.actual_cost)
+            if maintenance_data.notes is not None:
+                update_fields.append("notes = %s")
+                update_values.append(maintenance_data.notes)
+            if maintenance_data.status is not None:
+                update_fields.append("status = %s")
+                update_values.append(maintenance_data.status)
+            
+            update_fields.append("updated_at = %s")
+            update_values.append(datetime.now(timezone.utc))
+            
+            if update_fields:
+                query = f"UPDATE dumpster_maintenance SET {', '.join(update_fields)} WHERE id = %s"
+                update_values.append(maintenance_id)
+                await cursor.execute(query, tuple(update_values))
+            
+            # Get updated record
+            await cursor.execute(
+                """SELECT m.*, d.identifier as dumpster_identifier 
+                   FROM dumpster_maintenance m
+                   JOIN dumpsters d ON m.dumpster_id = d.id
+                   WHERE m.id = %s""",
+                (maintenance_id,)
+            )
+            result = await cursor.fetchone()
+            return Maintenance(**result)
+
+@api_router.patch("/maintenance/{maintenance_id}/complete")
+async def complete_maintenance(maintenance_id: str, actual_cost: Optional[float] = None, current_user: User = Depends(get_current_user)):
+    pool = await get_db()
+    async with pool.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            # Get maintenance record
+            await cursor.execute("SELECT * FROM dumpster_maintenance WHERE id = %s", (maintenance_id,))
+            maintenance = await cursor.fetchone()
+            if not maintenance:
+                raise HTTPException(status_code=404, detail="Maintenance record not found")
+            
+            # Update maintenance to completed
+            await cursor.execute(
+                """UPDATE dumpster_maintenance 
+                   SET status = %s, actual_end_date = %s, actual_cost = %s, updated_at = %s
+                   WHERE id = %s""",
+                (MaintenanceStatus.COMPLETED, datetime.now(timezone.utc), actual_cost, 
+                 datetime.now(timezone.utc), maintenance_id)
+            )
+            
+            # Update dumpster status to available
+            await cursor.execute(
+                "UPDATE dumpsters SET status = %s WHERE id = %s",
+                (DumpsterStatus.AVAILABLE, maintenance['dumpster_id'])
+            )
+            
+            return {"message": "Maintenance completed successfully"}
+
+@api_router.delete("/maintenance/{maintenance_id}")
+async def delete_maintenance(maintenance_id: str, current_user: User = Depends(get_current_user)):
+    pool = await get_db()
+    async with pool.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            await cursor.execute("DELETE FROM dumpster_maintenance WHERE id = %s", (maintenance_id,))
+            if cursor.rowcount == 0:
+                raise HTTPException(status_code=404, detail="Maintenance record not found")
+            return {"message": "Maintenance record deleted successfully"}
+
 app.include_router(api_router)
 
 app.add_middleware(
