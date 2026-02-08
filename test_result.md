@@ -167,15 +167,18 @@ backend:
 
   - task: "Contas a Pagar"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implementado com MySQL - rotas /api/finance/accounts-payable"
+      - working: true
+        agent: "testing"
+        comment: "✅ Testes realizados com sucesso. Criação de contas a pagar, listagem e marcação como pago funcionando corretamente. Exclusão de contas também testada e funcionando."
 
   - task: "Contas a Receber"
     implemented: true
