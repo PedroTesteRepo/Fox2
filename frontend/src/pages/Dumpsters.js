@@ -112,11 +112,61 @@ export const Dumpsters = () => {
   const getStatusLabel = (status) => {
     const labels = {
       available: 'Disponível',
-      rented: 'Alugada',
+      rented: 'Em Uso',
       maintenance: 'Manutenção',
       in_transit: 'Em Trânsito'
     };
     return labels[status] || status;
+  };
+
+  const getStatusColor = (status) => {
+    const colors = {
+      available: '#10b981', // green
+      rented: '#f59e0b',    // yellow/amber
+      maintenance: '#ef4444', // red
+      in_transit: '#3b82f6'  // blue
+    };
+    return colors[status] || '#64748b';
+  };
+
+  // SVG Component for Dumpster
+  const DumpsterIcon = ({ status, size = 80 }) => {
+    const color = getStatusColor(status);
+    return (
+      <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* Caçamba */}
+        <path
+          d="M20 35 L15 85 L85 85 L80 35 Z"
+          fill={color}
+          stroke={color}
+          strokeWidth="2"
+        />
+        {/* Tampa/Top */}
+        <rect
+          x="15"
+          y="30"
+          width="70"
+          height="8"
+          fill={color}
+          stroke="#000"
+          strokeWidth="1"
+          opacity="0.8"
+        />
+        {/* Detalhes laterais */}
+        <line x1="25" y1="40" x2="22" y2="80" stroke="#000" strokeWidth="1.5" opacity="0.3" />
+        <line x1="50" y1="40" x2="50" y2="80" stroke="#000" strokeWidth="1.5" opacity="0.3" />
+        <line x1="75" y1="40" x2="78" y2="80" stroke="#000" strokeWidth="1.5" opacity="0.3" />
+        {/* Base */}
+        <rect
+          x="12"
+          y="85"
+          width="76"
+          height="5"
+          fill="#1e293b"
+          rx="1"
+        />
+      </svg>
+    );
   };
 
   return (
