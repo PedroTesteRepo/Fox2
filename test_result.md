@@ -122,15 +122,18 @@ backend:
 
   - task: "CRUD Clientes"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implementado com MySQL - rotas /api/clients (POST, GET, PUT, DELETE)"
+      - working: true
+        agent: "testing"
+        comment: "✅ Testes completos realizados. Todas as operações CRUD funcionando corretamente. Criação, listagem, busca específica, atualização e exclusão de clientes testados com sucesso. IDs UUID funcionando corretamente."
 
   - task: "CRUD Caçambas"
     implemented: true
