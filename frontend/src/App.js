@@ -53,6 +53,14 @@ function App() {
             }
           />
           <Route
+            path="/maintenance"
+            element={
+              <ProtectedRoute>
+                <Maintenance />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/finance/cash"
             element={
               <ProtectedRoute>
