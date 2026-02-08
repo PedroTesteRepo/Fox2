@@ -540,7 +540,7 @@ class FOXAPITester:
 
 def main():
     """Função principal"""
-    base_url = "https://dazzling-albattani-2.preview.emergentagent.com"
+    base_url = "https://cargo-monitor-30.preview.emergentagent.com"
     tester = FOXAPITester(base_url)
     results = tester.run_all_tests()
     return results
