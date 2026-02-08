@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import json
 
 class FOXBackendTester:
-    def __init__(self, base_url="https://fox-bin-tracker.preview.emergentagent.com/api"):
+    def __init__(self, base_url="https://full-stack-ready.preview.emergentagent.com/api"):
         self.base_url = base_url
         self.token = None
         self.tests_run = 0
