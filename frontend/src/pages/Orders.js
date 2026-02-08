@@ -247,6 +247,28 @@ export const Orders = () => {
                     </Select>
                   </div>
 
+                  {formData.client_id && clientAddresses.length > 0 && (
+                    <div>
+                      <Label htmlFor="address_select">Selecionar Endereço Cadastrado</Label>
+                      <Select
+                        value={formData.delivery_address_id}
+                        onValueChange={handleAddressSelect}
+                      >
+                        <SelectTrigger className="rounded-sm">
+                          <SelectValue placeholder="Escolha um endereço ou digite abaixo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {clientAddresses.map((address) => (
+                            <SelectItem key={address.id} value={address.id}>
+                              {address.address_type} - {address.street}, {address.number} - {address.city}/{address.state}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-slate-500 mt-1">Ou digite um endereço personalizado abaixo</p>
+                    </div>
+                  )}
+
                   <div>
                     <Label htmlFor="delivery_address" data-testid="address-label">Endereço de Entrega</Label>
                     <Input
